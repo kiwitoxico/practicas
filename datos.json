@@ -58,7 +58,7 @@
     "id": 6,
     "titulo": "Portal de empleados con Single Sign-On",
     "descripcion": "Creación de un portal interno con autenticación centralizada usando Azure AD.",
-    "estado": "Borrador",
+    "estado": "Borrado",
     "fechaCreacion": "2026-05-20",
     "autor": "Carlos Ruiz",
     "categoria": "Desarrollo",

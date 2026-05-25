@@ -20,9 +20,79 @@
     </aside>
 
     <main class="main-content">
-        <h1>Bienvenido al sistema</h1>
-        <p>Este es el contenedor principal de tu página web. Como la barra lateral está fija a la izquierda, puedes añadir aquí todo el texto, tablas, JSONs o componentes que necesites, y la página hará scroll de forma independiente sin mover el menú.</p>
+        <div id="contenedor_tarjetas">
+		</div>
     </main>
+	<script>
+    // Función para cargar el JSON llamado "datos.json"
+    async function cargarDatos() {
+        try {
+            const url = "https://raw.githubusercontent.com/kiwitoxico/practicas/main/datos.json";
+            const respuesta = await fetch(url);
+			
+			if (!respuesta.ok) {
+                throw new Error('Error al cargar el archivo');
+            }
 
+            const datos = await respuesta.json();
+
+            console.log('Datos cargados:', datos); // Para ver los datos en consola
+
+            // Aquí decides qué hacer con los datos
+            mostrarEnTarjetas(datos);
+
+        } catch (error) {
+            console.error('Error al cargar datos.json:', error);
+            alert('No se pudo cargar el archivo datos.json');
+        }
+    }
+
+    // Función para mostrar los datos en tarjetas
+    function mostrarEnTarjetas(datos) {
+        const contenedor = document.getElementById('contenedor_tarjetas');
+        contenedor.innerHTML = '';
+
+        datos.forEach(item => {
+            const card = document.createElement('div');
+            card.className = 'proyecto-card';
+
+            // === Normalizamos el estado para crear la clase ===
+            const estadoClase = item.estado
+                .replace(/\s+/g, '-')      // Reemplaza espacios por guiones
+                .replace(/á/g, 'a')
+                .replace(/é/g, 'e')
+                .replace(/í/g, 'i')
+                .replace(/ó/g, 'o')
+                .replace(/ú/g, 'u');
+
+            const fecha = item.fechaCreacion 
+                ? new Date(item.fechaCreacion).toLocaleDateString('es-ES') 
+                : (item.fecha || 'Sin fecha');
+
+            card.innerHTML = `
+                <span class="estado-badge estado-${estadoClase}">${item.estado}</span>
+                
+                <h3>${item.titulo}</h3>
+                
+                <p class="descripcion">${item.descripcion}</p>
+                
+                <div class="proyecto-meta">
+                    <span>👤 ${item.autor}</span>
+                    <span>📅 ${fecha}</span>
+                </div>
+                
+                <div class="proyecto-stats">
+                    <span>👁️ ${item.vistas.toLocaleString()} vistas</span>
+                    <span>❤️ ${item.likes} likes</span>
+                </div>
+            `;
+
+            contenedor.appendChild(card);
+        });
+    }
+
+    // Ejecutar al cargar la página
+    cargarDatos();
+</script>
 </body>
 </html>
