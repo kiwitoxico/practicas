@@ -8,7 +8,7 @@
     "autor": "Laura Martínez",
     "categoria": "Diseño UX/UI",
     "vistas": 2450,
-    "likes": 187
+    
   },
   {
     "id": 2,
@@ -19,7 +19,7 @@
     "autor": "Carlos Ruiz",
     "categoria": "Desarrollo",
     "vistas": 980,
-    "likes": 64
+    
   },
   {
     "id": 3,
@@ -30,7 +30,7 @@
     "autor": "Ana López",
     "categoria": "Infraestructura",
     "vistas": 3120,
-    "likes": 231
+    
   },
   {
     "id": 4,
@@ -41,7 +41,7 @@
     "autor": "Miguel Torres",
     "categoria": "Desarrollo",
     "vistas": 650,
-    "likes": 42
+    
   },
   {
     "id": 5,
@@ -52,7 +52,7 @@
     "autor": "Laura Martínez",
     "categoria": "Automatización",
     "vistas": 1890,
-    "likes": 156
+    
   },
   {
     "id": 6,
@@ -63,7 +63,7 @@
     "autor": "Carlos Ruiz",
     "categoria": "Desarrollo",
     "vistas": 320,
-    "likes": 18
+    
   },
   {
     "id": 7,
@@ -74,7 +74,7 @@
     "autor": "Ana López",
     "categoria": "Inteligencia Artificial",
     "vistas": 1340,
-    "likes": 97
+    
   },
   {
     "id": 8,
@@ -85,7 +85,7 @@
     "autor": "Miguel Torres",
     "categoria": "Seguridad",
     "vistas": 2780,
-    "likes": 203
+    
   },
   {
     "id": 9,
@@ -96,7 +96,7 @@
     "autor": "Laura Martínez",
     "categoria": "Desarrollo",
     "vistas": 710,
-    "likes": 55
+    
   },
   {
     "id": 10,
@@ -107,6 +107,6 @@
     "autor": "Carlos Ruiz",
     "categoria": "Desarrollo",
     "vistas": 1560,
-    "likes": 121
+    
   }
 ]
