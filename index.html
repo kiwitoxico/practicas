@@ -47,8 +47,8 @@
                 <li><button class="menu-btn active" data-section="inicio">Inicio</button></li>
                 <li><button class="menu-btn" data-section="articulos">Proyectos</button></li>
                 <li><button id="logout-btn" class="menu-btn logout-btn">Cerrar Sesión</button></li>
-                <li><button class="menu-btn" data-section="configuracion">enconstruccion</button></li>
-                <li><button class="menu-btn" data-section="soporte">enconstruccion</button></li>
+                <li><button class="menu-btn" data-section="0">enconstruccion</button></li>
+                <li><button class="menu-btn" data-section="0">enconstruccion</button></li>
             </ul>
         </aside>
 
@@ -111,18 +111,31 @@
             qrDiv.innerHTML = '<p style="color:#94a3b8;">Generando código QR...</p>';
 
             try {
-                const res = await fetch(`${API_URL}/setup-2fa`, { method: 'GET' });
+                // Enviamos el email como parámetro
+                const res = await fetch(`${API_URL}/setup-2fa?email=${encodeURIComponent(email)}`);
                 const data = await res.json();
+
                 qrDiv.innerHTML = '';
+
+                if (data.alreadyConfigured) {
+                    // El usuario ya tiene 2FA configurado
+                    qrContainer.style.display = 'none';
+                    alert("Este usuario ya tiene 2FA configurado.");
+                    return;
+                }
 
                 if (data.qrCodeDataUrl) {
                     const img = document.createElement('img');
                     img.src = data.qrCodeDataUrl;
                     img.style.maxWidth = '200px';
                     qrDiv.appendChild(img);
+                } else {
+                    qrDiv.innerHTML = '<p style="color:#ef4444;">No se pudo generar el QR.</p>';
                 }
+
             } catch (error) {
-                qrDiv.innerHTML = `<p style="color:#ef4444;">Error al generar el QR</p>`;
+                console.error(error);
+                qrDiv.innerHTML = `<p style="color:#ef4444;">Error al conectar con el servidor para generar el QR.</p>`;
             }
         }
 
@@ -131,6 +144,8 @@
             e.preventDefault();
 
             const codigo = document.getElementById('2fa-code').value.trim();
+            const email = document.getElementById('email').value.trim(); // ← Obtenemos el email
+
             if (codigo.length !== 6) {
                 alert("Introduce un código de 6 dígitos válido.");
                 return;
@@ -140,7 +155,10 @@
                 const res = await fetch(`${API_URL}/verify-2fa`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ token: codigo })
+                    body: JSON.stringify({
+                        email: email,      // ← Enviamos el email
+                        token: codigo
+                    })
                 });
 
                 const data = await res.json();
@@ -148,25 +166,58 @@
                 if (data.success) {
                     onLoginExitoso();
                 } else {
-                    alert(data.message || "Código de verificación inválido.");
+                    alert(data.message || "Código incorrecto");
                 }
-            } catch (err) {
-                alert("Error al conectar con el servidor.");
+
+            } catch (error) {
+                console.error(error);
+                alert("Error al verificar el código");
             }
         });
 
         // ==================== AL LOGUEARSE CORRECTAMENTE ====================
-        function onLoginExitoso() {
-            // Guardar sesión por 10 minutos
-            const expiracion = Date.now() + DURACION_SESION;
-            localStorage.setItem('sesionExpiracion', expiracion);
-            localStorage.setItem('usuarioLogueado', 'true');
+        function onLoginExitoso(rol = 0) {   // rol = 0 → Admin, rol = 1 → Técnico
+        const expiracion = Date.now() + DURACION_SESION;
+        localStorage.setItem('sesionExpiracion', expiracion);
+        localStorage.setItem('usuarioLogueado', 'true');
+        localStorage.setItem('userRol', rol);           // ← Guardamos el rol
 
-            document.getElementById('2fa-section').style.display = 'none';
-            document.getElementById('dashboard-section').style.display = 'flex';
-            document.body.classList.add('dashboard-mode');
+        document.getElementById('2fa-section').style.display = 'none';
+        document.getElementById('dashboard-section').style.display = 'flex';
+        document.body.classList.add('dashboard-mode');
 
-            cargarDatos();
+        configurarMenuPorRol(rol);     // ← Configuramos el menú según rol
+        cargarSeccionPorDefecto(rol);  // ← Cargamos la sección inicial
+    }
+        function configurarMenuPorRol(rol) {
+            const menuItems = document.querySelectorAll('.menu-btn');
+
+            menuItems.forEach(button => {
+                const section = button.getAttribute('data-section');
+
+                if (rol === 1) { // Técnico
+                    // Ocultamos "Inicio" para técnicos
+                    if (section === 'inicio') {
+                        button.style.display = 'none';
+                    }
+                } else {
+                    // Administrador ve todo
+                    button.style.display = 'flex';
+                }
+            });
+        }
+        function cargarSeccionPorDefecto(rol) {
+            const contenedor = document.getElementById('contenedor_tarjetas');
+
+            if (rol === 0) {
+                // Administrador → va a Inicio por defecto
+                document.querySelector('.menu-btn[data-section="inicio"]').classList.add('active');
+                contenedor.innerHTML = '<h2>Bienvenido al Panel de Administración</h2>';
+            } else {
+                // Técnico → va directamente a Proyectos
+                document.querySelector('.menu-btn[data-section="articulos"]').classList.add('active');
+                cargarDatos(); // Carga los proyectos
+            }
         }
 
         // ==================== VERIFICAR SESIÓN AL CARGAR ====================
@@ -192,25 +243,45 @@
             location.reload();
         }
 
-        // ==================== CARGAR DATOS ====================
-        async function cargarDatos() {
-            const contenedor = document.getElementById('contenedor_tarjetas');
-            contenedor.innerHTML = '<p style="color:#64748b;">Cargando artículos...</p>';
+// ==================== CARGAR PROYECTOS ====================
+async function cargarDatos() {
+    const contenedor = document.getElementById('contenedor_tarjetas');
+    contenedor.innerHTML = '<p style="color:#64748b;">Cargando proyectos...</p>';
 
-            try {
-                const res = await fetch(`${API_URL}/proyectos`);
-                const proyectos = await res.json();
-                contenedor.innerHTML = '';
+    try {
+        const respuesta = await fetch(`${API_URL}/proyectos`);
 
-                proyectos.forEach(proyecto => {
-                    const tarjeta = crearTarjeta(proyecto);
-                    contenedor.appendChild(tarjeta);
-                });
-            } catch (error) {
-                contenedor.innerHTML = `<p style="color:red;">Error al cargar los datos. Usa Live Server.</p>`;
-            }
+        if (!respuesta.ok) {
+            throw new Error(`Error HTTP: ${respuesta.status}`);
         }
 
+        const proyectos = await respuesta.json();
+        contenedor.innerHTML = '';
+
+        if (proyectos.length === 0) {
+            contenedor.innerHTML = '<p>No hay proyectos para mostrar.</p>';
+            return;
+        }
+
+        proyectos.forEach(proyecto => {
+            const tarjeta = crearTarjeta(proyecto);
+            contenedor.appendChild(tarjeta);
+        });
+
+    } catch (error) {
+        console.error("Error al cargar proyectos:", error);
+        
+        contenedor.innerHTML = `
+            <div style="background:#fee2e2; color:#b91c1c; padding:1.2rem; border-radius:8px;">
+                <strong>No se pudieron cargar los proyectos</strong><br><br>
+                <small>
+                    Revisa la consola del navegador (F12) para ver el error exacto.<br>
+                    Asegúrate de que el endpoint <code>/api/proyectos</code> esté devolviendo los datos correctamente.
+                </small>
+            </div>
+        `;
+    }
+}
         function crearTarjeta(proyecto) {
             const div = document.createElement('div');
             div.className = 'tarjeta';
