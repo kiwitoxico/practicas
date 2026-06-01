@@ -298,4 +298,15 @@ body.dashboard-mode {
     #contenedor_tarjetas {
         grid-template-columns: 1fr;
     }
+
+/* Estilo especial para el botón de cerrar sesión */
+	.logout-btn {
+		color: #fca5a5 !important;
+		border: 1px solid #7f1d1d;
+	}
+
+	.logout-btn:hover {
+		background-color: #7f1d1d !important;
+		color: white !important;
+	}
 }

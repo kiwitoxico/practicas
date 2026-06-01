@@ -198,7 +198,7 @@
             contenedor.innerHTML = '<p style="color:#64748b;">Cargando artículos...</p>';
 
             try {
-                const res = await fetch('datos.json');
+                const res = await fetch(`${API_URL}/proyectos`);
                 const proyectos = await res.json();
                 contenedor.innerHTML = '';
 
@@ -260,6 +260,18 @@
         window.onload = function() {
             verificarSesion();
         };
+		// Función de cerrar sesión (si no la tienes ya)
+		function cerrarSesion() {
+			localStorage.removeItem('sesionExpiracion');
+			localStorage.removeItem('usuarioLogueado');
+			location.reload(); // Recarga la página y vuelve al login
+		}
+		
+		document.getElementById('logout-btn').addEventListener('click', () => {
+        if (confirm("¿Estás seguro de que quieres cerrar sesión?")) {
+            cerrarSesion();
+        }
+    });
     </script>
 </body>
 </html>
