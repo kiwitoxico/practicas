@@ -8,7 +8,7 @@
 </head>
 <body class="auth-mode">
 
-    <!-- ==================== LOGIN ==================== -->
+    <!-- LOGIN -->
     <div id="login-section" class="auth-container">
         <h2>Iniciar Sesión</h2>
         <p>Accede a tu panel de control</p>
@@ -16,63 +16,218 @@
         <form id="login-form">
             <input type="email" id="email" placeholder="Correo electrónico" value="kiwi@gmail.com" required>
             <input type="password" id="password" placeholder="Contraseña" value="123456" required>
-            
             <div id="login-error" style="color: #ef4444; font-size: 0.9rem; margin-top: 0.5rem; display: none;"></div>
-            
             <button type="submit">Siguiente</button>
         </form>
     </div>
 
-    <!-- ==================== 2FA ==================== -->
+    <!-- 2FA -->
     <div id="2fa-section" class="auth-container" style="display: none;">
         <h2>Verificación de Seguridad</h2>
-        <p>Introduce el código de 6 dígitos de tu app Google Authenticator.</p>
+        <p>Introduce el código de 6 dígitos.</p>
         
         <div id="qr-setup" style="display: none;">
-            <p>Escanea este código QR con tu aplicación:</p>
+            <p>Escanea este código QR:</p>
             <div id="qrcode"></div>
         </div>
 
         <form id="2fa-form">
-            <input type="text" id="2fa-code" placeholder="000000" maxlength="6" pattern="\d{6}" required>
-            <button type="submit">Verificar e Ingresar</button>
+            <input type="text" id="2fa-code" placeholder="000000" maxlength="6" required>
+            <button type="submit">Verificar</button>
         </form>
     </div>
 
-    <!-- ==================== DASHBOARD ==================== -->
+    <!-- DASHBOARD -->
     <div id="dashboard-section" style="display: none;">
         <aside class="sidebar">
             <h2>Panel de Control</h2>
             <ul class="sidebar-menu">
-                <li><button class="menu-btn active" data-section="inicio">Inicio</button></li>
-                <li><button class="menu-btn" data-section="articulos">Proyectos</button></li>
-                <li><button id="logout-btn" class="menu-btn logout-btn">Cerrar Sesión</button></li>
-                <li><button class="menu-btn" data-section="0">enconstruccion</button></li>
-                <li><button class="menu-btn" data-section="0">enconstruccion</button></li>
+                <li><button class="menu-btn" data-section="articulos">📦 Proyectos</button></li>
+                <li><button id="logout-btn" class="menu-btn logout-btn">🚪 Cerrar Sesión</button></li>
             </ul>
         </aside>
 
         <main class="main-content">
-            <h1>Artículos y Proyectos</h1>
+            <h1 id="titulo-principal">Artículos y Proyectos</h1>
+
+            <!-- BUSCADOR -->
+            <div id="search-container" style="margin-bottom: 1.5rem; display: none;">
+                <input type="text" id="search-input" placeholder="Buscar proyectos..." 
+                       style="width: 100%; max-width: 450px; padding: 0.7rem; border-radius: 8px; border: 1px solid #cbd5e1;">
+            </div>
+
             <div id="contenedor_tarjetas"></div>
         </main>
+    </div>
+
+    <!-- BOTÓN + -->
+    <button id="btn-add-project" style="display: none;">+</button>
+
+    <!-- MODAL CREAR PROYECTO -->
+    <div id="modal-crear-proyecto" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+         background: rgba(15, 23, 42, 0.6); z-index: 1000; justify-content: center; align-items: center;">
+        
+        <div style="background: white; padding: 2.5rem; border-radius: 16px; width: 90%; max-width: 480px;">
+            <h2 style="margin-bottom: 1.8rem; text-align: center;">Crear Nuevo Proyecto</h2>
+
+            <div class="form-group">
+                <label>Título</label>
+                <input type="text" id="modal-titulo" placeholder="Título del proyecto">
+            </div>
+
+            <div class="form-group">
+                <label>Descripción</label>
+                <textarea id="modal-descripcion" placeholder="Descripción" rows="4"></textarea>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <div class="form-group">
+                    <label>Autor</label>
+                    <input type="text" id="modal-autor" placeholder="Autor">
+                </div>
+                <div class="form-group">
+                    <label>Categoría</label>
+                    <input type="text" id="modal-categoria" placeholder="Categoría">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Estado</label>
+                <select id="modal-estado">
+                    <option value="Produccion">Produccion</option>
+                    <option value="Desarrollo">Desarrollo</option>
+                    <option value="Mantenimiento">Mantenimiento</option>
+                </select>
+            </div>
+
+            <div style="display: flex; gap: 12px; margin-top: 2rem;">
+                <button onclick="crearProyectoDesdeModal()" 
+                        style="flex: 1; background: #3b82f6; color: white; padding: 0.9rem; border: none; border-radius: 10px; font-weight: 600;">
+                    Crear Proyecto
+                </button>
+                <button onclick="cerrarModal()" 
+                        style="flex: 1; background: #f1f5f9; color: #475569; padding: 0.9rem; border: none; border-radius: 10px; font-weight: 600;">
+                    Cancelar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL EDITAR PROYECTO -->
+    <div id="modal-editar-proyecto" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+         background: rgba(15, 23, 42, 0.6); z-index: 1000; justify-content: center; align-items: center;">
+
+        <div style="background: white; padding: 2.5rem; border-radius: 16px; width: 90%; max-width: 480px;">
+            <h2 style="margin-bottom: 1.8rem; text-align: center;">Editar Proyecto</h2>
+            <input type="hidden" id="edit-id">
+
+            <div class="form-group">
+                <label>Título</label>
+                <input type="text" id="edit-titulo">
+            </div>
+
+            <div class="form-group">
+                <label>Descripción</label>
+                <textarea id="edit-descripcion" rows="4"></textarea>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <div class="form-group">
+                    <label>Autor</label>
+                    <input type="text" id="edit-autor">
+                </div>
+                <div class="form-group">
+                    <label>Categoría</label>
+                    <input type="text" id="edit-categoria">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Estado</label>
+                <select id="edit-estado">
+                    <option value="Produccion">Produccion</option>
+                    <option value="Desarrollo">Desarrollo</option>
+                    <option value="Mantenimiento">Mantenimiento</option>
+                </select>
+            </div>
+
+            <div style="display: flex; gap: 12px; margin-top: 2rem;">
+                <button onclick="guardarEdicionProyecto()" 
+                        style="flex: 1; background: #3b82f6; color: white; padding: 0.9rem; border: none; border-radius: 10px; font-weight: 600;">
+                    Guardar Cambios
+                </button>
+                <button onclick="cerrarModalEditar()" 
+                        style="flex: 1; background: #f1f5f9; color: #475569; padding: 0.9rem; border: none; border-radius: 10px; font-weight: 600;">
+                    Cancelar
+                </button>
+            </div>
+        </div>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
     <script>
-        // ==================== CONFIGURACIÓN ====================
-        const API_URL = 'http://143.47.60.81:3000/api';
-        const DURACION_SESION = 10 * 60 * 1000; // 10 minutos
+        const API_URL = 'http://localhost:3000/api';
+        let proyectosGlobal = [];
+        let rolActual = 0;
+
+        // ==================== CONFIGURACIÓN DE SESIÓN (30 MINUTOS) ====================
+        const DURACION_SESION = 30 * 60 * 1000; // 30 minutos
+
+        function iniciarSesion(rol = 0) {
+            const tiempoExpiracion = Date.now() + DURACION_SESION;
+            localStorage.setItem('sesionExpiracion', tiempoExpiracion);
+            localStorage.setItem('usuarioLogueado', 'true');
+            localStorage.setItem('userRol', rol);
+        }
+
+        function verificarSesion() {
+            const expiracion = localStorage.getItem('sesionExpiracion');
+            const logueado = localStorage.getItem('usuarioLogueado');
+
+            if (!expiracion || !logueado) {
+                return false;
+            }
+
+            if (Date.now() > parseInt(expiracion)) {
+                cerrarSesion();
+                return false;
+            }
+
+            return true;
+        }
+
+        function cerrarSesion() {
+            localStorage.removeItem('sesionExpiracion');
+            localStorage.removeItem('usuarioLogueado');
+            localStorage.removeItem('userRol');
+            window.location.reload();
+        }
+		// ==================== EVENTO DEL BOTÓN CERRAR SESIÓN ====================
+		document.getElementById('logout-btn').addEventListener('click', () => {
+			if (confirm("¿Estás seguro de que quieres cerrar sesión?")) {
+				cerrarSesion();
+			}
+		});
+        // Reiniciar tiempo de sesión con actividad
+        function resetearTiempoSesion() {
+            const expiracion = localStorage.getItem('sesionExpiracion');
+            if (expiracion) {
+                const nuevoTiempo = Date.now() + DURACION_SESION;
+                localStorage.setItem('sesionExpiracion', nuevoTiempo);
+            }
+        }
+
+        // Activar reset de sesión
+        ['click', 'mousemove', 'keypress', 'scroll'].forEach(evento => {
+            document.addEventListener(evento, resetearTiempoSesion);
+        });
 
         // ==================== LOGIN ====================
         document.getElementById('login-form').addEventListener('submit', async (e) => {
             e.preventDefault();
-
             const email = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value;
-            const errorDiv = document.getElementById('login-error');
-            errorDiv.style.display = 'none';
 
             try {
                 const res = await fetch(`${API_URL}/login`, {
@@ -80,218 +235,215 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ email, password })
                 });
-
                 const data = await res.json();
 
                 if (data.success) {
                     document.getElementById('login-section').style.display = 'none';
                     document.getElementById('2fa-section').style.display = 'block';
-
-                    if (!data.mfaConfigurado) {
-                        cargarQR(email);
-                    } else {
-                        document.getElementById('qr-setup').style.display = 'none';
-                    }
+                    if (!data.mfaConfigurado) cargarQR(email);
                 } else {
-                    errorDiv.textContent = data.message || "Correo o contraseña incorrectos";
-                    errorDiv.style.display = 'block';
+                    document.getElementById('login-error').textContent = data.message || "Credenciales incorrectas";
+                    document.getElementById('login-error').style.display = 'block';
                 }
-            } catch (err) {
-                errorDiv.textContent = "Error de conexión con el servidor";
-                errorDiv.style.display = 'block';
+            } catch {
+                alert("Error de conexión");
             }
         });
 
-        // ==================== CARGAR QR ====================
         async function cargarQR(email) {
             const qrContainer = document.getElementById('qr-setup');
             const qrDiv = document.getElementById('qrcode');
-
             qrContainer.style.display = 'block';
-            qrDiv.innerHTML = '<p style="color:#94a3b8;">Generando código QR...</p>';
+            qrDiv.innerHTML = '<p>Generando QR...</p>';
 
-            try {
-                // Enviamos el email como parámetro
-                const res = await fetch(`${API_URL}/setup-2fa?email=${encodeURIComponent(email)}`);
-                const data = await res.json();
+            const res = await fetch(`${API_URL}/setup-2fa?email=${encodeURIComponent(email)}`);
+            const data = await res.json();
+            qrDiv.innerHTML = '';
 
-                qrDiv.innerHTML = '';
-
-                if (data.alreadyConfigured) {
-                    // El usuario ya tiene 2FA configurado
-                    qrContainer.style.display = 'none';
-                    alert("Este usuario ya tiene 2FA configurado.");
-                    return;
-                }
-
-                if (data.qrCodeDataUrl) {
-                    const img = document.createElement('img');
-                    img.src = data.qrCodeDataUrl;
-                    img.style.maxWidth = '200px';
-                    qrDiv.appendChild(img);
-                } else {
-                    qrDiv.innerHTML = '<p style="color:#ef4444;">No se pudo generar el QR.</p>';
-                }
-
-            } catch (error) {
-                console.error(error);
-                qrDiv.innerHTML = `<p style="color:#ef4444;">Error al conectar con el servidor para generar el QR.</p>`;
+            if (data.qrCodeDataUrl) {
+                const img = document.createElement('img');
+                img.src = data.qrCodeDataUrl;
+                img.style.maxWidth = '200px';
+                qrDiv.appendChild(img);
             }
         }
 
-        // ==================== VERIFICAR CÓDIGO 2FA ====================
+        // VERIFICAR 2FA
         document.getElementById('2fa-form').addEventListener('submit', async (e) => {
             e.preventDefault();
-
             const codigo = document.getElementById('2fa-code').value.trim();
-            const email = document.getElementById('email').value.trim(); // ← Obtenemos el email
+            const email = document.getElementById('email').value.trim();
 
-            if (codigo.length !== 6) {
-                alert("Introduce un código de 6 dígitos válido.");
-                return;
-            }
+            const res = await fetch(`${API_URL}/verify-2fa`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, token: codigo })
+            });
+            const data = await res.json();
 
-            try {
-                const res = await fetch(`${API_URL}/verify-2fa`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        email: email,      // ← Enviamos el email
-                        token: codigo
-                    })
-                });
-
-                const data = await res.json();
-
-                if (data.success) {
-                    onLoginExitoso();
-                } else {
-                    alert(data.message || "Código incorrecto");
-                }
-
-            } catch (error) {
-                console.error(error);
-                alert("Error al verificar el código");
-            }
+            if (data.success) onLoginExitoso(data.rol || 0);
+            else alert(data.message || "Código incorrecto");
         });
 
-        // ==================== AL LOGUEARSE CORRECTAMENTE ====================
-        function onLoginExitoso(rol = 0) {   // rol = 0 → Admin, rol = 1 → Técnico
-        const expiracion = Date.now() + DURACION_SESION;
-        localStorage.setItem('sesionExpiracion', expiracion);
-        localStorage.setItem('usuarioLogueado', 'true');
-        localStorage.setItem('userRol', rol);           // ← Guardamos el rol
+        // ==================== LOGIN EXITOSO ====================
+        function onLoginExitoso(rol = 0) {
+            rolActual = rol;
+            iniciarSesion(rol); // ← Inicia sesión de 30 minutos
 
-        document.getElementById('2fa-section').style.display = 'none';
-        document.getElementById('dashboard-section').style.display = 'flex';
-        document.body.classList.add('dashboard-mode');
+            document.getElementById('2fa-section').style.display = 'none';
+            document.getElementById('dashboard-section').style.display = 'flex';
+            document.body.classList.add('dashboard-mode');
 
-        configurarMenuPorRol(rol);     // ← Configuramos el menú según rol
-        cargarSeccionPorDefecto(rol);  // ← Cargamos la sección inicial
-    }
+            configurarMenuPorRol(rol);
+            cargarSeccionPorDefecto(rol);
+        }
+
         function configurarMenuPorRol(rol) {
-            const menuItems = document.querySelectorAll('.menu-btn');
-
-            menuItems.forEach(button => {
-                const section = button.getAttribute('data-section');
-
-                if (rol === 1) { // Técnico
-                    // Ocultamos "Inicio" para técnicos
-                    if (section === 'inicio') {
-                        button.style.display = 'none';
-                    }
-                } else {
-                    // Administrador ve todo
-                    button.style.display = 'flex';
-                }
+            document.querySelectorAll('.menu-btn').forEach(btn => {
+                btn.style.display = 'flex';
             });
         }
-        function cargarSeccionPorDefecto(rol) {
-            const contenedor = document.getElementById('contenedor_tarjetas');
 
-            if (rol === 0) {
-                // Administrador → va a Inicio por defecto
-                document.querySelector('.menu-btn[data-section="inicio"]').classList.add('active');
-                contenedor.innerHTML = '<h2>Bienvenido al Panel de Administración</h2>';
-            } else {
-                // Técnico → va directamente a Proyectos
-                document.querySelector('.menu-btn[data-section="articulos"]').classList.add('active');
-                cargarDatos(); // Carga los proyectos
+				function cargarSeccionPorDefecto(rol) {
+			// Quitar active de todos los botones
+			document.querySelectorAll('.menu-btn').forEach(b => b.classList.remove('active'));
+
+			// Activar el botón de Proyectos
+			const btnProyectos = document.querySelector('.menu-btn[data-section="articulos"]');
+			if (btnProyectos) btnProyectos.classList.add('active');
+
+			// Cargar siempre los proyectos al entrar
+			cargarDatos();
+
+			// Mostrar el botón + solo si es Administrador (Rol 0)
+			if (rol === 0) {
+				document.getElementById('titulo-principal').innerText = 'Administración';
+				document.getElementById('btn-add-project').style.display = 'flex';
+			} else {
+				document.getElementById('titulo-principal').innerText = 'Artículos y Proyectos';
+				document.getElementById('btn-add-project').style.display = 'none';
+			}
+		}
+
+        // ==================== RESTO DE TU CÓDIGO (sin cambios) ====================
+        document.getElementById('btn-add-project').addEventListener('click', () => {
+            if (rolActual === 0) {
+                document.getElementById('modal-crear-proyecto').style.display = 'flex';
             }
-        }
-
-        // ==================== VERIFICAR SESIÓN AL CARGAR ====================
-        function verificarSesion() {
-            const expiracion = localStorage.getItem('sesionExpiracion');
-            const logueado = localStorage.getItem('usuarioLogueado');
-
-            if (expiracion && logueado && Date.now() < parseInt(expiracion)) {
-                document.getElementById('login-section').style.display = 'none';
-                document.getElementById('2fa-section').style.display = 'none';
-                document.getElementById('dashboard-section').style.display = 'flex';
-                document.body.classList.add('dashboard-mode');
-                cargarDatos();
-                return true;
-            }
-            return false;
-        }
-
-        // ==================== CERRAR SESIÓN ====================
-        function cerrarSesion() {
-            localStorage.removeItem('sesionExpiracion');
-            localStorage.removeItem('usuarioLogueado');
-            location.reload();
-        }
-
-// ==================== CARGAR PROYECTOS ====================
-async function cargarDatos() {
-    const contenedor = document.getElementById('contenedor_tarjetas');
-    contenedor.innerHTML = '<p style="color:#64748b;">Cargando proyectos...</p>';
-
-    try {
-        const respuesta = await fetch(`${API_URL}/proyectos`);
-
-        if (!respuesta.ok) {
-            throw new Error(`Error HTTP: ${respuesta.status}`);
-        }
-
-        const proyectos = await respuesta.json();
-        contenedor.innerHTML = '';
-
-        if (proyectos.length === 0) {
-            contenedor.innerHTML = '<p>No hay proyectos para mostrar.</p>';
-            return;
-        }
-
-        proyectos.forEach(proyecto => {
-            const tarjeta = crearTarjeta(proyecto);
-            contenedor.appendChild(tarjeta);
         });
 
-    } catch (error) {
-        console.error("Error al cargar proyectos:", error);
-        
-        contenedor.innerHTML = `
-            <div style="background:#fee2e2; color:#b91c1c; padding:1.2rem; border-radius:8px;">
-                <strong>No se pudieron cargar los proyectos</strong><br><br>
-                <small>
-                    Revisa la consola del navegador (F12) para ver el error exacto.<br>
-                    Asegúrate de que el endpoint <code>/api/proyectos</code> esté devolviendo los datos correctamente.
-                </small>
-            </div>
-        `;
-    }
-}
+        function cerrarModal() {
+            document.getElementById('modal-crear-proyecto').style.display = 'none';
+        }
+
+        function crearProyectoDesdeModal() {
+            if (rolActual !== 0) return alert("No tienes permisos.");
+
+            const nuevo = {
+                id: Date.now(),
+                titulo: document.getElementById('modal-titulo').value,
+                descripcion: document.getElementById('modal-descripcion').value,
+                autor: document.getElementById('modal-autor').value,
+                categoria: document.getElementById('modal-categoria').value,
+                estado: document.getElementById('modal-estado').value,
+                fechaCreacion: new Date().toISOString().split('T')[0],
+                vistas: 0
+            };
+
+            proyectosGlobal.unshift(nuevo);
+            renderizarTarjetas(proyectosGlobal);
+            cerrarModal();
+
+            document.getElementById('modal-titulo').value = '';
+            document.getElementById('modal-descripcion').value = '';
+            document.getElementById('modal-autor').value = '';
+            document.getElementById('modal-categoria').value = '';
+        }
+
+        function editarProyecto(id) {
+            if (rolActual !== 0) return alert("No tienes permisos para editar.");
+
+            const proyecto = proyectosGlobal.find(p => p.id === id);
+            if (!proyecto) return;
+
+            document.getElementById('edit-id').value = proyecto.id;
+            document.getElementById('edit-titulo').value = proyecto.titulo;
+            document.getElementById('edit-descripcion').value = proyecto.descripcion;
+            document.getElementById('edit-autor').value = proyecto.autor;
+            document.getElementById('edit-categoria').value = proyecto.categoria;
+            document.getElementById('edit-estado').value = proyecto.estado;
+
+            document.getElementById('modal-editar-proyecto').style.display = 'flex';
+        }
+
+        function guardarEdicionProyecto() {
+            const id = parseInt(document.getElementById('edit-id').value);
+            const proyecto = proyectosGlobal.find(p => p.id === id);
+            if (!proyecto) return;
+
+            proyecto.titulo = document.getElementById('edit-titulo').value;
+            proyecto.descripcion = document.getElementById('edit-descripcion').value;
+            proyecto.autor = document.getElementById('edit-autor').value;
+            proyecto.categoria = document.getElementById('edit-categoria').value;
+            proyecto.estado = document.getElementById('edit-estado').value;
+
+            renderizarTarjetas(proyectosGlobal);
+            cerrarModalEditar();
+        }
+
+        function cerrarModalEditar() {
+            document.getElementById('modal-editar-proyecto').style.display = 'none';
+        }
+
+        async function cargarDatos() {
+            const contenedor = document.getElementById('contenedor_tarjetas');
+            contenedor.innerHTML = '<p>Cargando proyectos...</p>';
+
+            const res = await fetch(`${API_URL}/proyectos`);
+            proyectosGlobal = await res.json();
+            contenedor.innerHTML = '';
+
+            renderizarTarjetas(proyectosGlobal);
+            activarBusquedaEnVivo();
+        }
+
+        function renderizarTarjetas(lista) {
+            const contenedor = document.getElementById('contenedor_tarjetas');
+            contenedor.innerHTML = '';
+
+            lista.forEach(p => {
+                const tarjeta = crearTarjeta(p);
+                contenedor.appendChild(tarjeta);
+            });
+        }
+
+        function activarBusquedaEnVivo() {
+            const input = document.getElementById('search-input');
+            input.oninput = () => {
+                const termino = input.value.toLowerCase().trim();
+                const filtrados = proyectosGlobal.filter(p =>
+                    p.titulo.toLowerCase().includes(termino) ||
+                    p.descripcion.toLowerCase().includes(termino) ||
+                    p.autor.toLowerCase().includes(termino)
+                );
+                renderizarTarjetas(filtrados);
+            };
+        }
+
         function crearTarjeta(proyecto) {
             const div = document.createElement('div');
             div.className = 'tarjeta';
 
             let estadoClase = '';
             switch (proyecto.estado.toLowerCase()) {
-                case 'publicado': estadoClase = 'estado-publicado'; break;
-                case 'en progreso': estadoClase = 'estado-en-progreso'; break;
-                case 'en revisión': estadoClase = 'estado-en-revision'; break;
-                case 'borrado': estadoClase = 'estado-borrado'; break;
+                case 'produccion': estadoClase = 'estado-produccion'; break;
+                case 'desarrollo': estadoClase = 'estado-desarrollo'; break;
+                case 'mantenimiento': estadoClase = 'estado-mantenimiento'; break;
+            }
+
+            let botones = '';
+            if (rolActual === 0) {
+                botones = `<button onclick="editarProyecto(${proyecto.id})" style="margin-top:12px; padding:6px 14px; background:#64748b; color:white; border:none; border-radius:6px; cursor:pointer;">Editar</button>`;
             }
 
             div.innerHTML = `
@@ -301,48 +453,45 @@ async function cargarDatos() {
                     <span>👤 ${proyecto.autor}</span>
                     <span>📅 ${proyecto.fechaCreacion}</span>
                     <span>🏷️ ${proyecto.categoria}</span>
-                    <span>👁️ ${proyecto.vistas.toLocaleString()} vistas</span>
+                    <span>👁️ ${proyecto.vistas} vistas</span>
                 </div>
                 <span class="estado ${estadoClase}">${proyecto.estado}</span>
+                ${botones}
             `;
             return div;
         }
 
-        // ==================== MENÚ LATERAL ====================
         document.querySelectorAll('.menu-btn').forEach(button => {
             button.addEventListener('click', () => {
-                document.querySelectorAll('.menu-btn').forEach(btn => btn.classList.remove('active'));
+                document.querySelectorAll('.menu-btn').forEach(b => b.classList.remove('active'));
                 button.classList.add('active');
 
                 const section = button.getAttribute('data-section');
-                const contenedor = document.getElementById('contenedor_tarjetas');
-
-                if (section === 'articulos') {
-                    cargarDatos();
-                } else if (section === 'inicio') {
-                    contenedor.innerHTML = '<h2>Bienvenido al Panel</h2>';
-                } else {
-                    contenedor.innerHTML = `<h2>${section.charAt(0).toUpperCase() + section.slice(1)} (próximamente)</h2>`;
-                }
+                if (section === 'articulos') cargarDatos();
             });
         });
 
         // ==================== INICIALIZACIÓN ====================
         window.onload = function() {
-            verificarSesion();
+            if (verificarSesion()) {
+                const rol = parseInt(localStorage.getItem('userRol')) || 0;
+                rolActual = rol;
+
+                document.getElementById('login-section').style.display = 'none';
+                document.getElementById('2fa-section').style.display = 'none';
+                document.getElementById('dashboard-section').style.display = 'flex';
+                document.body.classList.add('dashboard-mode');
+
+                configurarMenuPorRol(rol);
+                cargarSeccionPorDefecto(rol);
+            }
         };
-		// Función de cerrar sesión (si no la tienes ya)
-		function cerrarSesion() {
-			localStorage.removeItem('sesionExpiracion');
-			localStorage.removeItem('usuarioLogueado');
-			location.reload(); // Recarga la página y vuelve al login
-		}
-		
+		// ==================== CERRAR SESIÓN ====================
 		document.getElementById('logout-btn').addEventListener('click', () => {
-        if (confirm("¿Estás seguro de que quieres cerrar sesión?")) {
-            cerrarSesion();
-        }
-    });
+			if (confirm("¿Estás seguro de que quieres cerrar sesión?")) {
+				cerrarSesion();
+			}
+		});
     </script>
 </body>
 </html>

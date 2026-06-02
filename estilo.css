@@ -15,7 +15,7 @@
     --primary-hover: #2563eb;
     --text-main: #ffffff;
     --text-muted: #94a3b8;
-    
+   
     /* Dashboard */
     --bg-dashboard: #f8fafc;
     --bg-sidebar: #0f172a;
@@ -23,12 +23,6 @@
     --bg-card: #ffffff;
     --text-dark: #1e293b;
     --border-color: #e2e8f0;
-    
-    /* Estados */
-    --color-publicado: #10b981;
-    --color-en-progreso: #3b82f6;
-    --color-en-revision: #f59e0b;
-    --color-borrado: #ef4444;
 }
 
 /* ==========================================================================
@@ -271,11 +265,26 @@ body.dashboard-mode {
     color: white;
 }
 
-/* Colores de estado */
-.estado-publicado   { background-color: var(--color-publicado); }
-.estado-en-progreso { background-color: var(--color-en-progreso); }
-.estado-en-revision { background-color: var(--color-en-revision); }
-.estado-borrado     { background-color: var(--color-borrado); }
+/* ==================== COLORES DE ESTADOS ==================== */
+.estado-produccion {
+    background-color: #10b981;
+    color: white;
+}
+
+.estado-desarrollo {
+    background-color: #f59e0b;
+    color: white;
+}
+
+.estado-mantenimiento {
+    background-color: #6b7280;
+    color: white;
+}
+
+.estado-default {
+    background-color: #64748b;
+    color: white;
+}
 
 /* ==========================================================================
    ANIMACIONES Y RESPONSIVE
@@ -289,24 +298,80 @@ body.dashboard-mode {
     #dashboard-section {
         flex-direction: column;
     }
-    
+   
     .sidebar {
         width: 100%;
         padding: 1.5rem;
     }
-    
+   
     #contenedor_tarjetas {
         grid-template-columns: 1fr;
     }
+}
 
-/* Estilo especial para el botón de cerrar sesión */
-	.logout-btn {
-		color: #fca5a5 !important;
-		border: 1px solid #7f1d1d;
-	}
+/* Botón de cerrar sesión */
+.logout-btn {
+    color: #fca5a5 !important;
+    border: 1px solid #7f1d1d;
+}
 
-	.logout-btn:hover {
-		background-color: #7f1d1d !important;
-		color: white !important;
-	}
+.logout-btn:hover {
+    background-color: #7f1d1d !important;
+    color: white !important;
+}
+
+/* ==================== FORMULARIO (Modal) ==================== */
+.form-group {
+    margin-bottom: 1.3rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    color: #334155;
+    font-size: 0.95rem;
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1px solid #cbd5e1;
+    border-radius: 10px;
+    font-size: 1rem;
+    box-sizing: border-box;
+}
+
+.form-group textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+/* ==================== BOTÓN + FLOTANTE ==================== */
+#btn-add-project {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    z-index: 999;
+    background-color: #3b82f6;
+    color: white;
+    border: none;
+    width: 58px;
+    height: 58px;
+    border-radius: 12px;
+    font-size: 2rem;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 6px 16px rgba(59, 130, 246, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+#btn-add-project:hover {
+    background-color: #2563eb;
+    transform: scale(1.05);
 }

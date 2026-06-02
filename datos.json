@@ -3,110 +3,100 @@
     "id": 1,
     "titulo": "Rediseño de la plataforma corporativa",
     "descripcion": "Actualización completa de la interfaz de usuario y experiencia del usuario de la plataforma interna.",
-    "estado": "Publicado",
+    "estado": "Produccion",
     "fechaCreacion": "2026-04-12",
     "autor": "Laura Martínez",
     "categoria": "Diseño UX/UI",
-    "vistas": 2450,
-    
+    "vistas": 2450
   },
   {
     "id": 2,
     "titulo": "Implementación de sistema de analíticas avanzadas",
     "descripcion": "Integración de dashboards interactivos y reportes automatizados usando Power BI y APIs propias.",
-    "estado": "En progreso",
+    "estado": "Desarrollo",
     "fechaCreacion": "2026-05-03",
     "autor": "Carlos Ruiz",
     "categoria": "Desarrollo",
-    "vistas": 980,
-    
+    "vistas": 980
   },
   {
     "id": 3,
     "titulo": "Migración a infraestructura cloud (AWS)",
     "descripcion": "Migración completa de servidores on-premise a Amazon Web Services con alta disponibilidad.",
-    "estado": "Publicado",
+    "estado": "Produccion",
     "fechaCreacion": "2026-03-28",
     "autor": "Ana López",
     "categoria": "Infraestructura",
-    "vistas": 3120,
-    
+    "vistas": 3120
   },
   {
     "id": 4,
     "titulo": "App móvil para gestión de clientes",
     "descripcion": "Desarrollo de aplicación móvil nativa para iOS y Android para el equipo comercial.",
-    "estado": "En revisión",
+    "estado": "Desarrollo",
     "fechaCreacion": "2026-05-15",
     "autor": "Miguel Torres",
     "categoria": "Desarrollo",
-    "vistas": 650,
-    
+    "vistas": 650
   },
   {
     "id": 5,
     "titulo": "Automatización de procesos con RPA",
     "descripcion": "Implementación de robots RPA para automatizar tareas repetitivas del departamento de finanzas.",
-    "estado": "Publicado",
+    "estado": "Produccion",
     "fechaCreacion": "2026-04-05",
     "autor": "Laura Martínez",
     "categoria": "Automatización",
-    "vistas": 1890,
-    
+    "vistas": 1890
   },
   {
     "id": 6,
     "titulo": "Portal de empleados con Single Sign-On",
     "descripcion": "Creación de un portal interno con autenticación centralizada usando Azure AD.",
-    "estado": "Borrado",
+    "estado": "Mantenimiento",
     "fechaCreacion": "2026-05-20",
     "autor": "Carlos Ruiz",
     "categoria": "Desarrollo",
-    "vistas": 320,
-    
+    "vistas": 320
   },
   {
     "id": 7,
     "titulo": "Sistema de gestión documental inteligente",
     "descripcion": "Plataforma con IA para clasificar, buscar y gestionar documentos de forma automática.",
-    "estado": "En progreso",
+    "estado": "Desarrollo",
     "fechaCreacion": "2026-04-22",
     "autor": "Ana López",
     "categoria": "Inteligencia Artificial",
-    "vistas": 1340,
-    
+    "vistas": 1340
   },
   {
     "id": 8,
     "titulo": "Campaña de ciberseguridad corporativa",
     "descripcion": "Programa de concienciación y nuevas políticas de seguridad para toda la empresa.",
-    "estado": "Publicado",
+    "estado": "Produccion",
     "fechaCreacion": "2026-03-15",
     "autor": "Miguel Torres",
     "categoria": "Seguridad",
-    "vistas": 2780,
-    
+    "vistas": 2780
   },
   {
     "id": 9,
     "titulo": "Integración de pasarela de pagos",
     "descripcion": "Conexión con Stripe y PayPal para el nuevo módulo de suscripciones premium.",
-    "estado": "En revisión",
+    "estado": "Mantenimiento",
     "fechaCreacion": "2026-05-18",
     "autor": "Laura Martínez",
     "categoria": "Desarrollo",
-    "vistas": 710,
-    
+    "vistas": 710
   },
   {
     "id": 10,
     "titulo": "Optimización de rendimiento web",
     "descripcion": "Mejora de tiempos de carga, Core Web Vitals y optimización SEO técnico del sitio público.",
-    "estado": "Publicado",
+    "estado": "Produccion",
     "fechaCreacion": "2026-04-30",
     "autor": "Carlos Ruiz",
     "categoria": "Desarrollo",
-    "vistas": 1560,
-    
+    "vistas": 1560
   }
 ]
