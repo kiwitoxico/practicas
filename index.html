@@ -18,6 +18,10 @@
             <input type="password" id="password" placeholder="Contraseña" value="123456" required>
             <div id="login-error" style="color: #ef4444; font-size: 0.9rem; margin-top: 0.5rem; display: none;"></div>
             <button type="submit">Siguiente</button>
+			<button onclick="loginConCertificadoDigital()"
+				style="margin-top: 1rem; width: 100%; padding: 0.75rem; background: #166534; color: white; border: none; border-radius: 6px; font-weight: 600;">
+			🔐 Acceder con Certificado Digital
+			</button>
         </form>
     </div>
 
@@ -483,26 +487,27 @@
 
         // ==================== INICIALIZACIÓN ====================
         window.onload = function() {
-            if (verificarSesion()) {
-                const rol = parseInt(localStorage.getItem('userRol')) || 0;
-                rolActual = rol;
+    // Forzamos el cierre del 2FA por si quedó abierto de un intento anterior
+    const twofa = document.getElementById('2fa-section');
+    if (twofa) twofa.style.setProperty('display', 'none', 'important');
 
-                document.getElementById('login-section').style.display = 'none';
-                document.getElementById('2fa-section').style.display = 'none';
-                document.getElementById('dashboard-section').style.display = 'flex';
-                document.body.classList.add('dashboard-mode');
-
-                configurarMenuPorRol(rol);
-                cargarSeccionPorDefecto(rol);
-            }
-        };
+    if (verificarSesion()) {
+        const rol = parseInt(localStorage.getItem('userRol')) || 0;
+        rolActual = rol;
+        document.getElementById('login-section').style.display = 'none';
+        document.getElementById('2fa-section').style.display = 'none';
+        document.getElementById('dashboard-section').style.display = 'flex';
+        document.body.classList.add('dashboard-mode');
+        configurarMenuPorRol(rol);
+        cargarSeccionPorDefecto(rol);
+    }
+};
 		// ==================== CERRAR SESIÓN ====================
 		document.getElementById('logout-btn').addEventListener('click', () => {
 			if (confirm("¿Estás seguro de que quieres cerrar sesión?")) {
 				cerrarSesion();
 			}
 		});
-		
 
 		// Cargar proyectos y configurar filtros
 		async function cargarDatos() {
@@ -573,6 +578,71 @@
 			selectCategoria.addEventListener('change', aplicarFiltros);
 			inputBusqueda.addEventListener('input', aplicarFiltros);
 		}
+		
+// ==================== LOGIN CON CERTIFICADO DIGITAL (VERSIÓN MÍNIMA Y SEGURA) ====================
+function loginConCertificadoDigital() {
+    const opcion = prompt(
+        "Simular acceso con Certificado Digital:\n\n" +
+        "1 = Administrador (kiwi@gmail.com)\n" +
+        "2 = Técnico (otro@gmail.com)\n\n" +
+        "Elige 1 o 2:"
+    );
+
+    let rol = 0;
+
+    if (opcion === "1") {
+        rol = 0;
+    } else if (opcion === "2") {
+        rol = 1;
+    } else {
+        alert("Opción no válida");
+        return;
+    }
+
+    // Login directo SIN Google Authenticator
+    forzarLoginCertificado(rol);
+}
+
+function forzarLoginCertificado(rol = 0) {
+    rolActual = rol;
+    iniciarSesion(rol);
+
+    // === OCULTAMOS TODO LO DEL 2FA DE FORMA AGRESIVA ===
+    const loginSection = document.getElementById('login-section');
+    const twofaSection = document.getElementById('2fa-section');
+    const dashboard = document.getElementById('dashboard-section');
+
+    if (loginSection) loginSection.style.display = 'none';
+    if (twofaSection) {
+        twofaSection.style.setProperty('display', 'none', 'important');
+        twofaSection.style.setProperty('visibility', 'hidden', 'important');
+        twofaSection.style.setProperty('opacity', '0', 'important');
+    }
+    if (dashboard) dashboard.style.display = 'flex';
+
+    document.body.classList.add('dashboard-mode');
+
+    // Configuración manual del dashboard
+    if (rol === 0) {
+        document.getElementById('titulo-principal').innerText = 'Administración';
+        document.getElementById('btn-add-project').style.display = 'flex';
+    } else {
+        document.getElementById('titulo-principal').innerText = 'Artículos y Proyectos';
+        document.getElementById('btn-add-project').style.display = 'none';
+    }
+
+    // Seguridad extra: volvemos a ocultar el 2FA por si algo lo muestra después
+    setTimeout(() => {
+        const twofa = document.getElementById('2fa-section');
+        if (twofa) {
+            twofa.style.setProperty('display', 'none', 'important');
+            twofa.style.setProperty('visibility', 'hidden', 'important');
+        }
+    }, 50);
+
+    // Cargamos los proyectos
+    cargarDatos();
+}
     </script>
 </body>
 </html>
