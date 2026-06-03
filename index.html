@@ -49,12 +49,23 @@
 
         <main class="main-content">
             <h1 id="titulo-principal">Artículos y Proyectos</h1>
-
-            <!-- BUSCADOR -->
-            <div id="search-container" style="margin-bottom: 1.5rem; display: none;">
-                <input type="text" id="search-input" placeholder="Buscar proyectos..." 
-                       style="width: 100%; max-width: 450px; padding: 0.7rem; border-radius: 8px; border: 1px solid #cbd5e1;">
-            </div>
+			
+				<!-- FILTRO POR CATEGORÍA -->
+				<div style="margin-bottom: 1rem;">
+					<select id="filtro-categoria" 
+							style="padding: 0.6rem 1rem; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 1rem; min-width: 220px;">
+						<option value="">Todas las categorías</option>
+					</select>
+				</div>
+				<!-- buscador -->
+				<div id="search-container" style="margin-bottom: 1.5rem;">
+					<input 
+						type="text" 
+						id="search-input" 
+						placeholder="Buscar por título, descripción, autor o categoría..." 
+						style="width: 100%; max-width: 500px; padding: 0.75rem 1rem; border: 1px solid #cbd5e1; border-radius: 10px; font-size: 1rem;"
+						>
+				</div>
 
             <div id="contenedor_tarjetas"></div>
         </main>
@@ -325,7 +336,6 @@
 			}
 		}
 
-        // ==================== RESTO DE TU CÓDIGO (sin cambios) ====================
         document.getElementById('btn-add-project').addEventListener('click', () => {
             if (rolActual === 0) {
                 document.getElementById('modal-crear-proyecto').style.display = 'flex';
@@ -492,6 +502,77 @@
 				cerrarSesion();
 			}
 		});
+		
+
+		// Cargar proyectos y configurar filtros
+		async function cargarDatos() {
+			const contenedor = document.getElementById('contenedor_tarjetas');
+			contenedor.innerHTML = '<p>Cargando proyectos...</p>';
+
+			try {
+				const res = await fetch(`${API_URL}/proyectos`);
+				proyectosGlobal = await res.json();
+				contenedor.innerHTML = '';
+
+				// Cargar categorías en el selector
+				cargarCategoriasEnFiltro(proyectosGlobal);
+
+				// Mostrar todos los proyectos
+				renderizarTarjetas(proyectosGlobal);
+
+				// Activar filtros
+				activarFiltros();
+
+			} catch (error) {
+				contenedor.innerHTML = '<p style="color:red;">Error al cargar los proyectos.</p>';
+			}
+		}
+
+		// Cargar categorías únicas en el <select>
+		function cargarCategoriasEnFiltro(proyectos) {
+			const select = document.getElementById('filtro-categoria');
+			select.innerHTML = '<option value="">Todas las categorías</option>';
+
+			// Obtener categorías únicas
+			const categoriasUnicas = [...new Set(proyectos.map(p => p.categoria))];
+
+			categoriasUnicas.forEach(categoria => {
+				const option = document.createElement('option');
+				option.value = categoria;
+				option.textContent = categoria;
+				select.appendChild(option);
+			});
+		}
+
+		// Activar filtros (categoría + búsqueda)
+		function activarFiltros() {
+			const selectCategoria = document.getElementById('filtro-categoria');
+			const inputBusqueda = document.getElementById('search-input');
+
+			function aplicarFiltros() {
+				const categoriaSeleccionada = selectCategoria.value;
+				const textoBusqueda = inputBusqueda.value.toLowerCase().trim();
+
+				const filtrados = proyectosGlobal.filter(proyecto => {
+					const coincideCategoria = !categoriaSeleccionada || 
+											 proyecto.categoria === categoriaSeleccionada;
+
+					const coincideBusqueda = 
+						proyecto.titulo.toLowerCase().includes(textoBusqueda) ||
+						proyecto.descripcion.toLowerCase().includes(textoBusqueda) ||
+						proyecto.autor.toLowerCase().includes(textoBusqueda) ||
+						proyecto.categoria.toLowerCase().includes(textoBusqueda);
+
+					return coincideCategoria && coincideBusqueda;
+				});
+
+				renderizarTarjetas(filtrados);
+			}
+
+			// Eventos
+			selectCategoria.addEventListener('change', aplicarFiltros);
+			inputBusqueda.addEventListener('input', aplicarFiltros);
+		}
     </script>
 </body>
 </html>
